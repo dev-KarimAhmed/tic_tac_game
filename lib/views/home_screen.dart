@@ -21,80 +21,64 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       backgroundColor: Theme.of(context).primaryColor,
       body: SafeArea(
-          child: Column(
+          child: MediaQuery.of(context).orientation == Orientation.portrait ?  Column(
         children: [
-          SwitchListTile.adaptive(
-              title: const Text(
-                'Turn on/off two players',
-                style: TextStyle(color: Colors.white),
-              ),
-              value: isSwitched,
-              onChanged: (newVal) {
-                setState(() {
-                  isSwitched = newVal;
-                });
-              }),
-          Text(
-            'It\'s $activePlayer turn'.toUpperCase(),
-            style: const TextStyle(color: Colors.white, fontSize: 58),
-            textAlign: TextAlign.center,
-          ),
-          Expanded(
-              child: GridView.count(
-            padding: const EdgeInsets.all(16),
-            mainAxisSpacing: 8.0,
-            crossAxisSpacing: 8.0,
-            childAspectRatio: 1.0,
-            crossAxisCount: 3,
-            children: List.generate(
-                9,
-                (index) => GestureDetector(
-                      onTap: gameOver ? null : () => onTap(index),
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: Theme.of(context).shadowColor,
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                        child: Center(
-                          child: Text(
-                              Player.playerX.contains(index)
-                                  ? 'X'
-                                  : Player.playerO.contains(index)
-                                      ? 'O'
-                                      : '',
-                              style: TextStyle(
-                                  color: Player.playerX.contains(index)
-                                      ? Colors.blue
-                                      : Colors.pink,
-                                  fontSize: 58)),
-                        ),
-                      ),
-                    )),
-          )),
-          Text(
-            result.toUpperCase(),
-            style: const TextStyle(color: Colors.white, fontSize: 58),
-            textAlign: TextAlign.center,
-          ),
-          ElevatedButton.icon(
-            onPressed: () {
-              setState(() {
-                Player.playerX = [];
-                Player.playerO = [];
-                activePlayer = 'x';
-                turns = 0;
-                gameOver = false;
-                result = '';
-              });
-            },
-            label: const Text('Repeat the game'),
-            icon: const Icon(Icons.replay),
-            style: ElevatedButton.styleFrom(
-                backgroundColor: Theme.of(context).splashColor),
-          )
+          ...firstBlock(),
+          _expanded(context),
+          ...lastBlock(),
         ],
-      )),
+      ): Row(
+       children: [
+         Expanded(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+          ...firstBlock(),
+          const SizedBox(height: 20,),
+          ...lastBlock(),        
+         ],
+          ),
+        ),
+          _expanded(context),
+       ],
+      ),
+      ) ,
     );
+  }
+
+  Expanded _expanded(BuildContext context) {
+    return Expanded(
+        child: GridView.count(
+      padding: const EdgeInsets.all(16),
+      mainAxisSpacing: 8.0,
+      crossAxisSpacing: 8.0,
+      childAspectRatio: 1.0,
+      crossAxisCount: 3,
+      children: List.generate(
+          9,
+          (index) => GestureDetector(
+                onTap: gameOver ? null : () => onTap(index),
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).shadowColor,
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: Center(
+                    child: Text(
+                        Player.playerX.contains(index)
+                            ? 'X'
+                            : Player.playerO.contains(index)
+                                ? 'O'
+                                : '',
+                        style: TextStyle(
+                            color: Player.playerX.contains(index)
+                                ? Colors.blue
+                                : Colors.pink,
+                            fontSize: 58)),
+                  ),
+                ),
+              )),
+    ));
   }
 
   onTap(int index) async {
@@ -121,5 +105,53 @@ class _HomeScreenState extends State<HomeScreen> {
         result = 'It\'s Draw';
       }
     });
+  }
+
+  List<Widget> firstBlock() {
+    return [
+      SwitchListTile.adaptive(
+          title: const Text(
+            'Turn on/off two players',
+            style: TextStyle(color: Colors.white),
+          ),
+          value: isSwitched,
+          onChanged: (newVal) {
+            setState(() {
+              isSwitched = newVal;
+            });
+          }),
+      Text(
+        'It\'s $activePlayer turn'.toUpperCase(),
+        style: const TextStyle(color: Colors.white, fontSize: 58),
+        textAlign: TextAlign.center,
+      ),
+    ];
+  }
+
+  List<Widget> lastBlock() {
+    return [
+        Text(
+            result.toUpperCase(),
+            style: const TextStyle(color: Colors.white, fontSize: 58),
+            textAlign: TextAlign.center,
+          ),
+          ElevatedButton.icon(
+            onPressed: () {
+              setState(() {
+                Player.playerX = [];
+                Player.playerO = [];
+                activePlayer = 'x';
+                turns = 0;
+                gameOver = false;
+                result = '';
+              });
+            },
+            label: const Text('Repeat the game'),
+            icon: const Icon(Icons.replay),
+            style: ElevatedButton.styleFrom(
+                backgroundColor: Theme.of(context).splashColor),
+          )
+        
+    ];
   }
 }
